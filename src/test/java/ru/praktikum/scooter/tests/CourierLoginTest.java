@@ -1,5 +1,7 @@
 package ru.praktikum.scooter.tests;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.*;
 import java.util.*;
 import ru.praktikum.scooter.data.TestData;
@@ -8,9 +10,13 @@ import static ru.praktikum.scooter.data.Contract.*;
 
 public class CourierLoginTest extends CourierFixture {
 
+    @Rule
+    public org.junit.rules.TestName testName = new org.junit.rules.TestName();
+
     @Before
     public void setUp() {
         prepareData();
+        if (!testName.getMethodName().equals("shouldRejectUnregisteredCredentials")) createFixture();
     }
 
     @After
@@ -19,50 +25,57 @@ public class CourierLoginTest extends CourierFixture {
     }
 
     @Test
+    @DisplayName("shouldLoginWithValidCredentials")
+    @Description("should Login With Valid Credentials")
     public void shouldLoginWithValidCredentials() {
-        createFixture();
         body = TestData.credentials(courier);
         sendLogin();
         checkLogin();
     }
 
     @Test
+    @DisplayName("shouldRejectLoginWithoutLogin")
+    @Description("should Reject Login Without Login")
     public void shouldRejectLoginWithoutLogin() {
-        createFixture();
         body = TestData.credentials(courier);
-        body.remove("login");
+        body.login = null;
         sendLogin();
         checkMissing();
     }
 
     @Test
+    @DisplayName("shouldRejectLoginWithoutPassword")
+    @Description("should Reject Login Without Password")
     public void shouldRejectLoginWithoutPassword() {
-        createFixture();
         body = TestData.credentials(courier);
-        body.remove("password");
+        body.password = null;
         sendLogin();
         checkMissing();
     }
 
     @Test
+    @DisplayName("shouldRejectUnknownLogin")
+    @Description("should Reject Unknown Login")
     public void shouldRejectUnknownLogin() {
-        createFixture();
         body = TestData.credentials(courier);
-        body.put("login", "qa" + TestData.unique());
+        body.login = "qa" + TestData.unique();
         sendLogin();
         checkNotFound();
     }
 
     @Test
+    @DisplayName("shouldRejectWrongPassword")
+    @Description("should Reject Wrong Password")
     public void shouldRejectWrongPassword() {
-        createFixture();
         body = TestData.credentials(courier);
-        body.put("password", courier.get("password") + "x");
+        body.password = courier.password + "x";
         sendLogin();
         checkNotFound();
     }
 
     @Test
+    @DisplayName("shouldRejectUnregisteredCredentials")
+    @Description("should Reject Unregistered Credentials")
     public void shouldRejectUnregisteredCredentials() {
         body = TestData.credentials(courier);
         sendLogin();

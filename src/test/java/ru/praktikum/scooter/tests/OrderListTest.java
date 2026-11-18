@@ -2,6 +2,8 @@ package ru.praktikum.scooter.tests;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
 import java.util.*;
 import ru.praktikum.scooter.api.OrderClient;
@@ -28,6 +30,8 @@ public class OrderListTest {
     }
 
     @Test
+    @DisplayName("shouldReturnOrdersArray")
+    @Description("should Return Orders Array")
     public void shouldReturnOrdersArray() {
         requestList();
         checkList();

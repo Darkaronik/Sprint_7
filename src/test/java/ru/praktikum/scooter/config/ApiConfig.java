@@ -16,6 +16,4 @@ public final class ApiConfig {
 
     public static final int READ_TIMEOUT = Integer.getInteger("scooter.readTimeout", 15000);
 
-    private ApiConfig() {
-    }
 }

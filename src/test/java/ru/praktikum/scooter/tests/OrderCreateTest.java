@@ -2,6 +2,8 @@ package ru.praktikum.scooter.tests;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -16,19 +18,29 @@ import static ru.praktikum.scooter.data.Contract.*;
 @RunWith(Parameterized.class)
 public class OrderCreateTest {
 
+    public enum ColorVariant {
+        BLACK("BLACK", Collections.singletonList("BLACK")),
+        GREY("GREY", Collections.singletonList("GREY")),
+        BOTH("BLACK и GREY", Arrays.asList("BLACK", "GREY")),
+        NO_COLOR("без color", null);
+
+        private final String label;
+        private final List<String> colors;
+
+        ColorVariant(String label, List<String> colors) {
+            this.label = label;
+            this.colors = colors;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
     @Parameterized.Parameters(name = "{index} — {0}")
-    public static Collection<Object[]> colors() {
-        return Arrays.asList(new Object[][] {
-            {
-                "BLACK", Collections.singletonList("BLACK")
-            }, {
-                "GREY", Collections.singletonList("GREY")
-            }, {
-                "BLACK и GREY", Arrays.asList("BLACK", "GREY")
-            }, {
-                "без color", null
-            }
-        });
+    public static ColorVariant[] colors() {
+        return ColorVariant.values();
     }
 
     private final List<String> colors;
@@ -37,7 +49,7 @@ public class OrderCreateTest {
 
     private String marker;
 
-    private Map<String, Object> body;
+    private ru.praktikum.scooter.data.OrderRequest body;
 
     private Response response;
 
@@ -45,8 +57,8 @@ public class OrderCreateTest {
 
     private boolean attempted;
 
-    public OrderCreateTest(String name, List<String> colors) {
-        this.colors = colors;
+    public OrderCreateTest(ColorVariant variant) {
+        this.colors = variant.colors;
     }
 
     @Before
@@ -73,6 +85,8 @@ public class OrderCreateTest {
     }
 
     @Test
+    @DisplayName("shouldCreateOrderForColorVariant")
+    @Description("should Create Order For Color Variant")
     public void shouldCreateOrderForColorVariant() {
         sendOrder();
         checkOrder();

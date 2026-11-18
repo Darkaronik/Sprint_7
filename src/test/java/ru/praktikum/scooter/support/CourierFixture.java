@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import java.util.*;
 import ru.praktikum.scooter.api.CourierClient;
 import ru.praktikum.scooter.data.TestData;
+import ru.praktikum.scooter.data.CourierRequest;
 import static org.junit.Assert.*;
 import static ru.praktikum.scooter.config.ApiConfig.*;
 import static ru.praktikum.scooter.data.Contract.*;
@@ -13,11 +14,11 @@ public class CourierFixture {
 
     protected final CourierClient client = new CourierClient();
 
-    protected final List<Map<String, Object>> attempts = new ArrayList<>();
+    protected final List<CourierRequest> attempts = new ArrayList<>();
 
     protected final Set<Long> ids = new LinkedHashSet<>();
 
-    protected Map<String, Object> courier, body;
+    protected CourierRequest courier, body;
 
     protected Response response;
 
@@ -36,7 +37,7 @@ public class CourierFixture {
 
     @Step("Создать тестового курьера и получить его ID")
     public void createFixture() {
-        body = new LinkedHashMap<>(courier);
+        body = courier.copy();
         sendCreate();
         Checks.status(response, CREATED, "POST", COURIER);
         Checks.ok(response);
@@ -49,16 +50,16 @@ public class CourierFixture {
     @Step("Отправить запрос создания курьера")
     public void sendCreate() {
         requestPath = COURIER;
-        if (body.containsKey("login") && body.containsKey("password")) attempts.add(TestData.credentials(body));
+        if (body.login != null && body.password != null) attempts.add(TestData.credentials(body));
         else unidentifiable = true;
         try {
             response = client.create(body);
         } catch (RuntimeException e) {
-            if (unidentifiable) System.err.println("Не удалось подтвердить очистку попытки без обязательного поля: " + courier.get("login"));
+            if (unidentifiable) System.err.println("Не удалось подтвердить очистку попытки без обязательного поля: " + courier.login);
             throw e;
         }
         if (unidentifiable && response.statusCode() != CREATED) unidentifiable = false;
-        if (response.statusCode() == CREATED && !body.containsKey("firstName") && !unidentifiable) Checks.ok(response);
+        if (response.statusCode() == CREATED && body.firstName == null && !unidentifiable) Checks.ok(response);
     }
 
     @Step("Отправить запрос авторизации курьера")
@@ -88,17 +89,17 @@ public class CourierFixture {
     @Step("Очистить собственных курьеров")
     public void cleanup() {
         List<String> errors = new ArrayList<>();
-        if (unidentifiable) errors.add("Невозможно подтвердить очистку создания без обязательного поля, логин: " + courier.get("login"));
-        for (Map<String, Object> attempt : attempts) {
+        if (unidentifiable) errors.add("Невозможно подтвердить очистку создания без обязательного поля, логин: " + courier.login);
+        for (CourierRequest attempt : attempts) {
             try {
                 Response login = client.login(attempt);
                 if (login.statusCode() == OK) {
                     Long id = Checks.positiveInteger(login.jsonPath().get("id"));
                     if (id != null) ids.add(id);
-                    else errors.add("В ответе входа нет корректного ID для " + attempt.get("login"));
-                } else if (login.statusCode() != NOT_FOUND) errors.add("Поиск курьера " + attempt.get("login") + ": HTTP " + login.statusCode());
+                    else errors.add("В ответе входа нет корректного ID для " + attempt.login);
+                } else if (login.statusCode() != NOT_FOUND) errors.add("Поиск курьера " + attempt.login + ": HTTP " + login.statusCode());
             } catch (Exception e) {
-                errors.add("Поиск курьера " + attempt.get("login") + ": " + e.getClass().getSimpleName());
+                errors.add("Поиск курьера " + attempt.login + ": " + e.getClass().getSimpleName());
             }
         }
         for (long id : ids) {
