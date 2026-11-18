@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
 public final class OrderRequest {
     @JsonProperty("firstName")
     private final String firstName;

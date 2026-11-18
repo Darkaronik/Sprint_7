@@ -7,6 +7,7 @@ import static ru.praktikum.scooter.config.ApiConfig.*;
 
 public class OrderClient {
 
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static final class CancelRequest {
         @JsonProperty("track")
         private final long track;
