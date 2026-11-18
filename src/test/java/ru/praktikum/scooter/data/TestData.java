@@ -20,10 +20,7 @@ public final class TestData {
     }
 
     public static OrderRequest order(List<String> colors, String marker) {
-        OrderRequest order = new OrderRequest();
-        order.deliveryDate = LocalDate.now().plusDays(7).toString();
-        order.comment = marker;
-        order.color = colors;
-        return order;
+        return new OrderRequest("Test", "Testov", "Test street 1", "1", "+79990000000", 1,
+                LocalDate.now().plusDays(7).toString(), marker, colors);
     }
 }

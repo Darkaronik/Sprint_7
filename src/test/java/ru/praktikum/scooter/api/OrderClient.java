@@ -1,14 +1,19 @@
 package ru.praktikum.scooter.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.response.Response;
 import ru.praktikum.scooter.data.OrderRequest;
 import static ru.praktikum.scooter.config.ApiConfig.*;
 
 public class OrderClient {
 
-    public static class CancelRequest {
-        public final long track;
-        public CancelRequest(long track) { this.track = track; }
+    private static final class CancelRequest {
+        @JsonProperty("track")
+        private final long track;
+
+        private CancelRequest(long track) {
+            this.track = track;
+        }
     }
 
     public Response create(OrderRequest body) {

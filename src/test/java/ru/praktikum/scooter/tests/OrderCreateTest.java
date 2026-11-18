@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import java.util.*;
 import ru.praktikum.scooter.api.OrderClient;
+import ru.praktikum.scooter.data.OrderRequest;
 import ru.praktikum.scooter.data.TestData;
 import ru.praktikum.scooter.support.Checks;
 import static org.junit.Assert.*;
@@ -49,7 +50,7 @@ public class OrderCreateTest {
 
     private String marker;
 
-    private ru.praktikum.scooter.data.OrderRequest body;
+    private OrderRequest body;
 
     private Response response;
 
